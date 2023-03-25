@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using bugtrackerback.Areas.Identity.Data;
+using bugtrackerback.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace bugtrackerback.Controllers
 {
@@ -8,10 +11,23 @@ namespace bugtrackerback.Controllers
     [ApiController]
     public class ProjectController : ControllerBase
     {
-        [HttpPost("projects"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetProjects()
+        private readonly bugtrackerdbContext BugtrackerdbContext;
+        public ProjectController(bugtrackerdbContext bugtrackerdbContext)
         {
-            return Ok("Super secret hello");
+            BugtrackerdbContext = bugtrackerdbContext;
+        }
+
+        
+        [HttpPost("projects1"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetProjects1()
+        {
+            return Ok("result of request");
+        }
+
+        [HttpPost("projects")]
+        public async Task<List<Project>> GetProjects()
+        {
+            return await BugtrackerdbContext.Projects.ToListAsync();
         }
     }
 }

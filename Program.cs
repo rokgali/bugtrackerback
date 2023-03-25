@@ -57,9 +57,10 @@ builder.Services.AddCors(options =>
         {
             // To specify which origins are allowed use
             // builder.WithOrigins();
-            builder.AllowAnyHeader()
-                   .AllowAnyMethod()
+            builder.AllowAnyOrigin()
+                   .AllowAnyHeader()
                    .AllowAnyMethod();
+                   
         });
 });
 
