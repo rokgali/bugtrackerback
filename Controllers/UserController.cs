@@ -1,15 +1,21 @@
-﻿using bugtrackerback.Entities;
+﻿using bugtrackerback.Areas.Identity.Data;
+using bugtrackerback.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using NuGet.Protocol;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace bugtrackerback.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -18,22 +24,26 @@ namespace bugtrackerback.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly bugtrackerdbContext _context;
 
-        public UserController(UserManager<User> userManager, 
-            SignInManager<User> signInManager, IConfiguration 
-            configuration, RoleManager<IdentityRole> roleManager)
+        public UserController(UserManager<User> userManager,
+            SignInManager<User> signInManager, IConfiguration
+            configuration, RoleManager<IdentityRole> roleManager,
+            bugtrackerdbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _roleManager = roleManager;
+            _context = context;
         }
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> RegisterUser(UserRegisterDTO registerData)
         {
             User userCheck = await _userManager.FindByEmailAsync(registerData.Email);
 
-            if(userCheck != null)
+            if (userCheck != null)
             {
                 return BadRequest("A user with this email already exists");
             }
@@ -56,12 +66,13 @@ namespace bugtrackerback.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(UserLoginDTO loginData)
         {
             User loginUser = await _userManager.FindByEmailAsync(loginData.Email);
             var result = await _signInManager.PasswordSignInAsync(loginUser, loginData.Password, false, false);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 return BadRequest("Invalid email or password");
             }
@@ -114,18 +125,62 @@ namespace bugtrackerback.Controllers
             return result;
         }
 
-        [HttpPost("Role")]
+        [HttpPost("addRoleToUser")]
         public async Task<IActionResult> AddRole(string email, string roleName)
         {
             User user = await _userManager.FindByEmailAsync(email);
             var result = await _userManager.AddToRoleAsync(user, roleName);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
             }
 
             return Ok(result);
+        }
+
+        [HttpPost("usersEmails")]
+        public async Task<IActionResult> GetUserEmails()
+        {   
+            var users = await _context.Users.Select(u => new { u.Id, u.Name, u.Surname, u.Email }).ToListAsync();
+            return Ok(users);
+        }
+
+        [HttpPost("JWTcheck")]
+        public Task<bool> ValidateToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes
+                (_configuration.GetSection("AppSettings:Token").Value)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            try
+            {
+                SecurityToken validatedToken;
+                tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+                return Task.FromResult(true);
+            }
+            catch
+            {
+                return Task.FromResult(false);
+            }
+        }
+
+        [HttpGet("userEmail")]
+        public Task<string> GetUserEmail(string jwt)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwt);
+
+            var email = token.Claims.First(c => c.Type == ClaimTypes.Name).Value;
+
+            return Task.FromResult(email);
         }
     }
 }
