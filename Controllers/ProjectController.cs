@@ -1,15 +1,14 @@
 ﻿using bugtrackerback.Areas.Identity.Data;
 using bugtrackerback.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace bugtrackerback.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
+    // [Authorize]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProjectController : ControllerBase
     {
@@ -22,27 +21,13 @@ namespace bugtrackerback.Controllers
             _userManager = userManager;
         }
 
-        
-        [HttpPost("projects1"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetProjects1()
-        {
-            return Ok("result of request");
-        }
-
-        [HttpPost("projects")]
-        public async Task<List<Project>> GetProjects()
-        {
-            return await _context.Projects.ToListAsync();
-        }
-
-
-        [HttpPost("createProject")]
+        [HttpPost]
         public async Task<IActionResult> CreateProject(ProjectCreationDTO projectData)
         {
             User currentUser = await _userManager.FindByEmailAsync(projectData.UserEmail);
             List<User> assignedUserList = new List<User>();
             User? foundUser = null;
-            if(projectData.AssignedUserEmails != null)
+            if(projectData.AssignedUserEmails != null && projectData.AssignedUserEmails.Count > 0)
             {
                 foreach (string email in projectData.AssignedUserEmails)
                 {
@@ -56,13 +41,31 @@ namespace bugtrackerback.Controllers
             {
                 Name = projectData.Name,
                 Description = projectData.Description,
-                Author = currentUser,
+                AuthorId = currentUser.Id,
                 Users = assignedUserList
             };
 
             var result = await _context.Projects.AddAsync(newProject);
+            await _context.SaveChangesAsync();
 
-            return Ok(result);
+            return Ok("Project created succesfully");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetProjectData()
+        { 
+            var projectData = await _context.Projects.Select(p => new { p.Id, p.Name, p.Description }).ToListAsync();
+
+            return Ok(projectData);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetAssignedUsers(string projectId)
+        {
+            var usersInProject = _context.Projects.Where(p => p.Id.ToString() == projectId)
+                .SelectMany(c => c.Users).Select(u => new { u.Id, u.Email, u.Name, u.Surname });
+
+            return Ok(usersInProject);
         }
     }
 }

@@ -16,7 +16,7 @@ using System.Text;
 namespace bugtrackerback.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -37,7 +37,7 @@ namespace bugtrackerback.Controllers
             _roleManager = roleManager;
             _context = context;
         }
-        [HttpPost("register")]
+        [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterUser(UserRegisterDTO registerData)
         {
@@ -65,7 +65,7 @@ namespace bugtrackerback.Controllers
             return Ok("User has been created");
         }
 
-        [HttpPost("login")]
+        [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login(UserLoginDTO loginData)
         {
@@ -114,7 +114,7 @@ namespace bugtrackerback.Controllers
             return jwt;
         }
 
-        [HttpPost("createRole")]
+        [HttpPost]
         public async Task<IdentityResult> CreateRole(string roleName)
         {
             var role = new IdentityRole { Name = roleName };
@@ -125,7 +125,7 @@ namespace bugtrackerback.Controllers
             return result;
         }
 
-        [HttpPost("addRoleToUser")]
+        [HttpPost]
         public async Task<IActionResult> AddRole(string email, string roleName)
         {
             User user = await _userManager.FindByEmailAsync(email);
@@ -139,14 +139,14 @@ namespace bugtrackerback.Controllers
             return Ok(result);
         }
 
-        [HttpPost("usersEmails")]
-        public async Task<IActionResult> GetUserEmails()
+        [HttpPost]
+        public async Task<IActionResult> GetUserData()
         {   
             var users = await _context.Users.Select(u => new { u.Id, u.Name, u.Surname, u.Email }).ToListAsync();
             return Ok(users);
         }
 
-        [HttpPost("JWTcheck")]
+        [HttpPost]
         public Task<bool> ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -172,7 +172,7 @@ namespace bugtrackerback.Controllers
             }
         }
 
-        [HttpGet("userEmail")]
+        [HttpGet]
         public Task<string> GetUserEmail(string jwt)
         {
             var handler = new JwtSecurityTokenHandler();

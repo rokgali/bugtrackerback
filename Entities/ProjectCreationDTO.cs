@@ -1,4 +1,6 @@
-﻿namespace bugtrackerback.Entities
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace bugtrackerback.Entities
 {
     public class ProjectCreationDTO
     {
