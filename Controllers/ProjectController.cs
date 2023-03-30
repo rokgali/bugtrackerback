@@ -1,5 +1,6 @@
 ﻿using bugtrackerback.Areas.Identity.Data;
 using bugtrackerback.Entities;
+using bugtrackerback.Entities.DTOS;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -62,10 +63,48 @@ namespace bugtrackerback.Controllers
         [HttpPost]
         public async Task<IActionResult> GetAssignedUsers(string projectId)
         {
-            var usersInProject = _context.Projects.Where(p => p.Id.ToString() == projectId)
+            var usersInProject = _context.Projects.Where(p => p.Id == projectId)
                 .SelectMany(c => c.Users).Select(u => new { u.Id, u.Email, u.Name, u.Surname });
 
             return Ok(usersInProject);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> IsIdValid(string projectId)
+        {
+            bool idCheck = _context.Projects.Where(p => p.Id == projectId).Any();
+
+            return Ok(idCheck);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditTeam(EditTeamDTO teamData)
+        {
+            var project = _context.Projects.Include(u => u.Users).SingleOrDefault(p => p.Id == teamData.ProjectId);
+            List<User> assignedUsers = new List<User>();
+            foreach(string id in teamData.UsersIds)
+            {
+                User user = _context.Users.FirstOrDefault(u => u.Id == id);
+                if (user != null)
+                {
+                    assignedUsers.Add(user);
+                }
+            }
+
+            if(project != null)
+            {
+                project.Users.Clear();
+
+                if(assignedUsers.Count > 0)
+                {
+                    project.Users.AddRange(assignedUsers);
+                }
+                _context.SaveChanges();
+
+                return Ok("Success");
+            }
+
+            return BadRequest("The project doesn't exist");
         }
     }
 }

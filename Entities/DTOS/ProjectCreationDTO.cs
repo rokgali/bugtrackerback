@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace bugtrackerback.Entities
+namespace bugtrackerback.Entities.DTOS
 {
     public class ProjectCreationDTO
     {

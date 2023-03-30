@@ -1,4 +1,4 @@
-﻿namespace bugtrackerback.Entities
+﻿namespace bugtrackerback.Entities.DTOS
 {
     public class UserLoginDTO
     {

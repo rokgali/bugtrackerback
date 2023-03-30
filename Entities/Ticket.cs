@@ -24,7 +24,7 @@ namespace bugtrackerback.Entities
     };
     public class Ticket
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public Priority Priority { get; set; }

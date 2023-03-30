@@ -54,9 +54,10 @@ namespace bugtrackerback.Migrations
                 name: "Projects",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AuthorId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -173,7 +174,7 @@ namespace bugtrackerback.Migrations
                 name: "ProjectUser",
                 columns: table => new
                 {
-                    ProjectsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProjectsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UsersId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -197,13 +198,14 @@ namespace bugtrackerback.Migrations
                 name: "Tickets",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    AuthorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProjectId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -220,11 +222,11 @@ namespace bugtrackerback.Migrations
                 name: "TicketComments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    TicketId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    TicketId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -238,15 +240,14 @@ namespace bugtrackerback.Migrations
                         name: "FK_TicketComments_Tickets_TicketId",
                         column: x => x.TicketId,
                         principalTable: "Tickets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "TicketUser",
                 columns: table => new
                 {
-                    TicketsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TicketsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UsersId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>

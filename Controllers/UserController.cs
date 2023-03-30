@@ -1,5 +1,6 @@
 ﻿using bugtrackerback.Areas.Identity.Data;
 using bugtrackerback.Entities;
+using bugtrackerback.Entities.DTOS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

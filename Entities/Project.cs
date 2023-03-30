@@ -4,7 +4,7 @@ namespace bugtrackerback.Entities
 {
     public class Project
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public List<User>? Users { get; set; }

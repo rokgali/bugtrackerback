@@ -24,9 +24,8 @@ namespace bugtrackerback.Migrations
 
             modelBuilder.Entity("bugtrackerback.Entities.Project", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
@@ -47,9 +46,8 @@ namespace bugtrackerback.Migrations
 
             modelBuilder.Entity("bugtrackerback.Entities.Ticket", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
@@ -62,8 +60,9 @@ namespace bugtrackerback.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ProjectId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -84,9 +83,8 @@ namespace bugtrackerback.Migrations
 
             modelBuilder.Entity("bugtrackerback.Entities.TicketComment", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AuthorId")
                         .HasColumnType("nvarchar(450)");
@@ -98,8 +96,8 @@ namespace bugtrackerback.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("TicketId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("TicketId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -322,8 +320,8 @@ namespace bugtrackerback.Migrations
 
             modelBuilder.Entity("ProjectUser", b =>
                 {
-                    b.Property<Guid>("ProjectsId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ProjectsId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UsersId")
                         .HasColumnType("nvarchar(450)");
@@ -337,8 +335,8 @@ namespace bugtrackerback.Migrations
 
             modelBuilder.Entity("TicketUser", b =>
                 {
-                    b.Property<Guid>("TicketsId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("TicketsId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UsersId")
                         .HasColumnType("nvarchar(450)");
@@ -369,9 +367,7 @@ namespace bugtrackerback.Migrations
 
                     b.HasOne("bugtrackerback.Entities.Ticket", "Ticket")
                         .WithMany("Comments")
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TicketId");
 
                     b.Navigation("Author");
 
