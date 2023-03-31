@@ -106,5 +106,12 @@ namespace bugtrackerback.Controllers
 
             return BadRequest("The project doesn't exist");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAssignedTickets(string projectId)
+        {
+
+            return Ok();
+        }
     }
 }

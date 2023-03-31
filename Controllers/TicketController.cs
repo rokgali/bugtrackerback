@@ -48,5 +48,12 @@ namespace bugtrackerback.Controllers
 
             return BadRequest("Failed to create ticket");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAssignedUsers(string ticketId)
+        {
+
+            return Ok();
+        }
     }
 }
