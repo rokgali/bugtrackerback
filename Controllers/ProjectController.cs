@@ -110,8 +110,21 @@ namespace bugtrackerback.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAssignedTickets(string projectId)
         {
+            var project = await _context.Projects.Include(p => p.Tickets).FirstOrDefaultAsync(p => p.Id == projectId);
+            List<Ticket> assignedTickets = new List<Ticket>();
 
-            return Ok();
+            if(project != null)
+            {
+                foreach(Ticket ticket in project.Tickets)
+                {
+                    assignedTickets.Add(ticket);
+                }
+
+                var returnData = assignedTickets.Select(t => new { t.Id, t.Title, t.Description, t.Priority, t.Type, t.Status, t.AuthorId }).ToList();
+                return Ok(returnData);
+            }
+
+            return BadRequest("Project with specified id does not exist");
         }
     }
 }

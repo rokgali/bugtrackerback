@@ -52,8 +52,21 @@ namespace bugtrackerback.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAssignedUsers(string ticketId)
         {
+            var foundTicket = await _context.Tickets.Include(t => t.Users).FirstOrDefaultAsync(t => t.Id == ticketId);
+            List<User> ticketUsers = new List<User>();
 
-            return Ok();
+            if(foundTicket != null)
+            {
+                foreach(User user in foundTicket.Users)
+                {
+                    ticketUsers.Add(user);
+                }
+
+                var returnUserData = ticketUsers.Select(u => new { u.Id, u.Email, u.Name, u.Surname }); 
+                return Ok(returnUserData);
+            }
+
+            return BadRequest("Ticket does not exist");
         }
     }
 }
