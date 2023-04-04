@@ -62,11 +62,57 @@ namespace bugtrackerback.Controllers
                     ticketUsers.Add(user);
                 }
 
-                var returnUserData = ticketUsers.Select(u => new { u.Id, u.Email, u.Name, u.Surname }); 
+                var returnUserData = ticketUsers.Select(u => new { u.Id, u.Email, u.Name, u.Surname }).ToList(); 
                 return Ok(returnUserData);
             }
 
             return BadRequest("Ticket does not exist");
+        }
+        [HttpPost]
+        public async Task<IActionResult> WriteComment(CommentDTO commentDTO)
+        {
+            var ticket = await _context.Tickets.FirstAsync(t => t.Id == commentDTO.TicketId);
+
+            if(ticket != null)
+            {
+                var author = await _context.Users.FirstAsync(u => u.Email == commentDTO.AuthorEmail);
+
+                TicketComment comment = new TicketComment()
+                {
+                    Comment = commentDTO.Comment,
+                    Author = author,
+                    Ticket = ticket
+                };
+
+                await _context.TicketComments.AddAsync(comment);
+                await _context.SaveChangesAsync();
+
+                return Ok("Ticket succesfully commented");
+            }
+
+            return BadRequest("Ticket does not exist");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetComments(string ticketId)
+        {
+            var ticket = await _context.Tickets.Include(t => t.Comments).FirstOrDefaultAsync(t => t.Id == ticketId);
+            List<TicketComment> comments = new List<TicketComment>();
+
+            if(ticket.Comments != null)
+            {
+                var author = await _context.Users.FirstOrDefaultAsync(u => u.Id == ticket.AuthorId);
+
+                foreach (TicketComment comment in ticket.Comments)
+                {
+                    comments.Add(comment);
+                }
+
+                var commentData = comments.Select(c => new {c.Id, c.DateTime, c.Comment, author.Name, author.Surname, author.Email});
+                return Ok(commentData);
+            }
+
+            return BadRequest("This ticket does not exist");
         }
     }
 }
