@@ -96,23 +96,13 @@ namespace bugtrackerback.Controllers
         [HttpGet]
         public async Task<IActionResult> GetComments(string ticketId)
         {
-            var ticket = await _context.Tickets.Include(t => t.Comments).FirstOrDefaultAsync(t => t.Id == ticketId);
-            List<TicketComment> comments = new List<TicketComment>();
+            var comments = _context.TicketComments.Include(c => c.Author)
+                .Where(c => c.Ticket.Id == ticketId)
+                .ToList();
 
-            if(ticket.Comments != null)
-            {
-                var author = await _context.Users.FirstOrDefaultAsync(u => u.Id == ticket.AuthorId);
+            var returnData = comments.Select(d => new { d.Id, d.DateTime, d.Comment, d.Author.Name, d.Author.Surname, d.Author.Email });
 
-                foreach (TicketComment comment in ticket.Comments)
-                {
-                    comments.Add(comment);
-                }
-
-                var commentData = comments.Select(c => new {c.Id, c.DateTime, c.Comment, author.Name, author.Surname, author.Email});
-                return Ok(commentData);
-            }
-
-            return BadRequest("This ticket does not exist");
+            return Ok(returnData);
         }
     }
 }
