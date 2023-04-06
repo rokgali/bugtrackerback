@@ -104,5 +104,29 @@ namespace bugtrackerback.Controllers
 
             return Ok(returnData);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> EditTicket(EditTicketDTO editTicketDTO)
+        {
+            var ticketToEdit = await _context.Tickets.Include(t => t.Users).Where(t => t.Id == editTicketDTO.Id).FirstAsync();
+
+            if(ticketToEdit != null)
+            {
+                var userList = await _context.Users.Where(u => editTicketDTO.UserIds.Contains(u.Id)).ToListAsync();
+     
+                ticketToEdit.Title = editTicketDTO.Title;
+                ticketToEdit.Description = editTicketDTO.Description;
+                ticketToEdit.Priority = editTicketDTO.Priority;
+                ticketToEdit.Type = editTicketDTO.Type;
+                ticketToEdit.Status = editTicketDTO.Status;
+                ticketToEdit.Users = userList;
+
+                await _context.SaveChangesAsync();
+
+                return Ok("Ticket edited succesfully");
+            }
+
+            return BadRequest("The ticket does not exist");
+        }
     }
 }

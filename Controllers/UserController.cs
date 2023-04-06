@@ -183,5 +183,11 @@ namespace bugtrackerback.Controllers
 
             return Task.FromResult(email);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCreatedTickets(string userId)
+        {
+            return Ok();
+        }
     }
 }
