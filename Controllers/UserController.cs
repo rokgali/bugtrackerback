@@ -16,7 +16,7 @@ using System.Text;
 
 namespace bugtrackerback.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -187,7 +187,9 @@ namespace bugtrackerback.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCreatedTickets(string userId)
         {
-            return Ok();
+            var tickets = await _context.Tickets.Where(t => t.AuthorId == userId).ToListAsync();
+
+            return Ok(tickets);
         }
     }
 }
