@@ -92,6 +92,7 @@ namespace bugtrackerback.Controllers
             List<Claim> claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Sid, user.Id)
             };
 
             foreach (var userRole in userRoles.GetResult())
@@ -185,9 +186,20 @@ namespace bugtrackerback.Controllers
         }
 
         [HttpGet]
+        public Task<string> GetId(string jwt)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwt);
+
+            var id = token.Claims.First(c => c.Type == ClaimTypes.Sid).Value;
+
+            return Task.FromResult(id);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetCreatedTickets(string userId)
         {
-            var tickets = await _context.Tickets.Where(t => t.AuthorId == userId).ToListAsync();
+            var tickets = await _context.Tickets.Include(t => t.Project).Where(t => t.AuthorId == userId).Select(t => new { projectId = t.Project.Id, t.Id, t.Title, t.Description, t.Status, t.Priority, t.Type, t.CreationTime}).ToListAsync();
 
             return Ok(tickets);
         }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using bugtrackerback.Areas.Identity.Data;
 
@@ -11,9 +12,10 @@ using bugtrackerback.Areas.Identity.Data;
 namespace bugtrackerback.Migrations
 {
     [DbContext(typeof(bugtrackerdbContext))]
-    partial class bugtrackerdbContextModelSnapshot : ModelSnapshot
+    [Migration("20230408131407_update1")]
+    partial class update1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

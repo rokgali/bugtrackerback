@@ -30,6 +30,7 @@ namespace bugtrackerback.Entities
         public Priority Priority { get; set; }
         public Type Type { get; set; }
         public Status Status { get; set; }
+        public DateTime CreationTime { get; set; } = DateTime.UtcNow;
         public string AuthorId { get; set; } = null!;
         public List<TicketComment>? Comments { get; set; }
         public List<User>? Users { get; set; }

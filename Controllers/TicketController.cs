@@ -96,9 +96,9 @@ namespace bugtrackerback.Controllers
         [HttpGet]
         public async Task<IActionResult> GetComments(string ticketId)
         {
-            var comments = _context.TicketComments.Include(c => c.Author)
+            var comments = await _context.TicketComments.Include(c => c.Author)
                 .Where(c => c.Ticket.Id == ticketId)
-                .ToList();
+                .ToListAsync();
 
             var returnData = comments.Select(d => new { d.Id, d.DateTime, d.Comment, d.Author.Name, d.Author.Surname, d.Author.Email });
 
