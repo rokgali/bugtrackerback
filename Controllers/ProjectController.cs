@@ -120,8 +120,9 @@ namespace bugtrackerback.Controllers
                     assignedTickets.Add(ticket);
                 }
 
-                var returnData = assignedTickets.Select(t => new { t.Id, t.Title, t.Description, t.Priority, t.Type, t.Status, t.AuthorId }).ToList();
-                return Ok(returnData);
+                var sortedTickets = assignedTickets.OrderByDescending(t => t.CreationTime)
+                    .Select(t => new { t.Id, t.Title, t.Description, t.Priority, t.Type, t.Status, t.AuthorId }).ToList();
+                return Ok(sortedTickets);
             }
 
             return BadRequest("Project with specified id does not exist");
